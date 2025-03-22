@@ -3,5 +3,35 @@
 ## Links to Assignments
 
 **Week 1**
-1. [HTML-recap](https://github.com/RedEyeSH/WebCourse/blob/7e29ba2142751af06785c5ef0d1b23e25f58d9ae/Week1/HTML-recap/main.html)
-2. [CSS-recap](https://github.com/RedEyeSH/WebCourse/blob/7e29ba2142751af06785c5ef0d1b23e25f58d9ae/Week1/HTML-recap/main.html)
+### HTML-recap
+[HTML file](https://github.com/RedEyeSH/WebCourse/blob/7e29ba2142751af06785c5ef0d1b23e25f58d9ae/Week1/HTML-recap/main.html)
+
+### CSS-recap
+[HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/CSS-recap/main.html)
+[CSS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/CSS-recap/style.css)
+
+### JS-recap1
+1. **Task 1**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t1/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t1/script.js)
+
+2. **Task 2**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t2/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t2/script.js)
+
+3. **Task 3**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t3/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t3/script.js)
+   
+4. **Task 4**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t4/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t4/script.js)
+   
+5. **Task 5**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t5/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t5/script.js)
+   
+6. **Task 6**
+   [HTML file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t6/main.html)
+   [JS file](https://github.com/RedEyeSH/WebCourse/blob/fd443697be72cd79e579166d27ee859530ba6016/Week1/JS-recap1/t6/script.js)
+   
