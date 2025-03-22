@@ -1,6 +1,6 @@
 # WebDevelopment
 
-**Week 1**
+## Week 1
 ### HTML-recap
 - [HTML file](https://github.com/RedEyeSH/WebCourse/blob/7e29ba2142751af06785c5ef0d1b23e25f58d9ae/Week1/HTML-recap/main.html)
 - **[Webdisk](https://users.metropolia.fi/~quangth/WebCourse/Week1/HTML-recap/main.html)**
@@ -74,4 +74,4 @@
 
 ---
 
-**Week 2**
+## Week 2
