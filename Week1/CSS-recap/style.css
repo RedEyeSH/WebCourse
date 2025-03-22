@@ -1,0 +1,27 @@
+* {
+    font-family: cursive;
+}
+
+a {
+    text-decoration: none;
+    color: red;
+    transition: 0.25s;
+}
+
+a:hover {
+    color: blue;
+}
+
+img {
+    border: 2px solid black;
+    border-radius: 10px;
+}
+
+ul {
+    list-style: lower-alpha;
+}
+
+tr:nth-child(2) {
+    background-color: cornflowerblue;
+    
+}
