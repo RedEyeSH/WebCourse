@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/2ed076f63b.js" crossorigin="anonymous"></script>
+    <script src="script.js" defer></script>
+    <title>Opiskelijaravintola</title>
+</head>
+<body>
+    <!-- Navbar starts here -->
+    <nav class="navbar">
+        <div class="navbar-logo">
+            <h1>Opiskelijaravintola</h1>
+        </div>
+        <div class="navbar-link">
+            <a href="">Ravintolat</a>
+            <a href="">Kartta</a>
+        </div>
+        <div class="navbar-login" id="navbar-login">
+            <i class="fa-solid fa-circle-user"></i>
+            <p>Login</p>
+        </div>
+    </nav>
+    <!-- Navbar ends here -->
+
+    <!-- Account's forms starts here -->
+    <section class="account" id="account">
+        <div class="account-container" id="account-container">
+            <div class="account-box-image">
+                <img src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="">
+            </div>
+            <div class="login-form" id="login-form">
+                <div class="login-title">
+                    <h1>Sign in to your account</h1>
+                    <i class="fa-solid fa-xmark" id="x-close-form"></i>
+                </div>
+                <form action="">
+                    <div class="login-email">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" placeholder="Email" required>
+                    </div>
+                    <div class="login-password">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter password" required>
+                    </div>
+                    <div class="login-options">
+                        <label for="remember-me">
+                            <input type="checkbox" id="remember-me"> Remember me
+                        </label>
+                        <a href="#">Forgot password?</a>
+                    </div>
+                    <div class="login-submit">
+                        <input type="submit" value="Sign in">
+                    </div>
+                </form>
+                <div class="login-other-options">
+                    <p>Don't have an account?</p>
+                    <a href="#" id="signup">Sign up now</a>
+                </div>
+            </div>
+            <!-- Sign up maybe here -->
+            <div class="signup-form" id="signup-form">
+                <div class="signup-title">
+                    <h1>Get Started</h1>
+                    <i class="fa-solid fa-xmark" id="x-close-form"></i>
+                </div>
+                <form action="">
+                    <!-- <div class="signup-date">
+                        <div class="signup-day">
+                            <label for="signup-day">Day</label>
+                            <select name="signup-day" id="signup-day" required></select>
+                        </div>
+                        <div class="signup-month">
+                            <label for="signup-month">Month</label>
+                            <select name="signup-month" id="signup-month" required>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="signup-year">
+                            <label for="signup-year">Year</label>
+                            <select name="signup-year" id="signup-year" required></select>
+                        </div>
+                    </div> -->
+                    <div class="signup-email">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" placeholder="Email" required>
+                    </div>
+                    <div class="signup-password">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" placeholder="Enter password" required>
+                    </div>
+                    <div class="signup-password-confirmation">
+                        <label for="signup-password-confirmation">Confirm password</label>
+                        <input type="password" id="signup-password-confirmation" placeholder="Confirm your password" required>
+                    </div>
+                    <div class="signup-submit">
+                        <input type="submit" value="Sign up">
+                    </div>
+                </form>
+                <div class="signup-other-options">
+                    <p>Have an account?</p>
+                    <a href="#" id="login">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Account forms ends here -->
+
+    <div class="box-overlay" id="box-overlay"></div> <!-- Box overlay -->
+    
+    <!-- Search section starts here -->
+    <section class="search">
+        <div class="search-container">
+            <i class="fa-solid fa-arrow-right"></i>
+            <input type="text" placeholder="Search for restaurant">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+    </section>
+    <!-- Search section ends here -->
+
+    <!-- Restaurant section starts here -->
+    <section class="restaurant">
+        <div class="restaurant-box">
+            <div class="restaurant-box-header">
+                <h1>Restaurant name, city</h1>
+                <i class="fa-regular fa-heart"></i>
+            </div>
+            <div class="restaurant-box-description">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque officia aperiam ratione consectetur pariatur quasi quis et animi esse laborum consequatur hic, officiis libero accusantium quaerat asperiores non doloribus numquam.</p>
+            </div>
+            <div class="restaurant-box-info">
+                <div class="restaurant-box-info-address">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <h4>address, postal code</h4>
+                </div>
+                <div class="restaurant-box-info-visit">
+                    <h3>Visit</h3>
+                </div>
+            </div>
+        </div>
+        <div class="restaurant-box">
+            <div class="restaurant-box-header">
+                <h1>Restaurant name, city</h1>
+                <i class="fa-regular fa-heart"></i>
+            </div>
+            <div class="restaurant-box-description">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque officia aperiam ratione consectetur pariatur quasi quis et animi esse laborum consequatur hic, officiis libero accusantium quaerat asperiores non doloribus numquam.</p>
+            </div>
+            <div class="restaurant-box-info">
+                <div class="restaurant-box-info-address">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <h4>address, postal code</h4>
+                </div>
+                <div class="restaurant-box-info-visit">
+                    <h3>Visit</h3>
+                </div>
+            </div>
+        </div>
+        <div class="restaurant-box">
+            <div class="restaurant-box-header">
+                <h1>Restaurant name, city</h1>
+                <i class="fa-regular fa-heart"></i>
+            </div>
+            <div class="restaurant-box-description">
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque officia aperiam ratione consectetur pariatur quasi quis et animi esse laborum consequatur hic, officiis libero accusantium quaerat asperiores non doloribus numquam.</p>
+            </div>
+            <div class="restaurant-box-info">
+                <div class="restaurant-box-info-address">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <h4>address, postal code</h4>
+                </div>
+                <div class="restaurant-box-info-visit">
+                    <h3>Visit</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="restaurant-box">
+            <div class="restaurant-box-header">
+                <h1>Restaurant</h1>
+                <i class="fa-regular fa-heart"></i>
+            </div>
+        </div> -->
+    </section>
+    <!-- Restaurant section ends here -->
+
+    <!-- Map section starts here -->
+    <section class="map">
+        <div class="map-container"></div>
+    </section>
+    <!-- Map section ends here -->
+
+    <!-- Testing template -->
+    <section class="test">
+
+    </section>
+
+</body>
+</html>
