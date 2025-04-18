@@ -49,6 +49,17 @@ function removeAccountClasses() {
     document.getElementById("signup-form").classList.remove("close-signup-form");
 }
 
+function removeProfileClasses() {
+    const profile = document.getElementById("profile");
+    profile.classList.remove("open-profile-section");
+
+    const profile_container = document.getElementById("profile-container");
+    profile_container.classList.remove("open-profile-container");
+
+    const close_profile_bOverlay = document.getElementById("profile-box-overlay");
+    close_profile_bOverlay.classList.remove("show-profile-box-overlay");
+}
+
 const close_form = document.querySelectorAll("#x-close-form");
 close_form.forEach((button) => {
     button.addEventListener('click', removeAccountClasses);
@@ -62,6 +73,7 @@ close_form_bOverlay.addEventListener('click', removeAccountClasses);
 
 // Account login/signup setup ends here
 const apiUrl = "https://media2.edu.metropolia.fi/restaurant/api/v1";
+const imgUrl = "https://media2.edu.metropolia.fi/restaurant/uploads";
 
 // Restaurant search api starts here
 let active_dropdown = null;
@@ -169,7 +181,7 @@ getCompanyNames();
 // Restaurant search api ends here
 
 // Restaurant cards/boxes starts here
-const getRestaurants = async (search_text = "") => {
+const getRestaurants = async (search_text = "", favourite_restaurant_id = null) => {
     try {
         const allRestaurants = await fetchData(`${apiUrl}/restaurants`);
         if (!allRestaurants) throw new Error("Failed to fetch restaurants.");
@@ -183,7 +195,6 @@ const getRestaurants = async (search_text = "") => {
             const match_city = selected_filters.city === "All cities" || restaurant.city === selected_filters.city;
             const match_company = selected_filters.company === "All companies" || restaurant.company === selected_filters.company;
             return match_search_text && match_city && match_company;
-
         });
 
         // console.log(filtered_restaurants);
@@ -199,7 +210,7 @@ const getRestaurants = async (search_text = "") => {
         let currentIndex = 0;
 
         for (let i = 0; i < container_count; i++) {
-            // 3 boxes per 1 restaurant container div
+            // Creating 3 boxes per 1 restaurant container div
             const restaurant_container = document.createElement("div");
             restaurant_container.classList.add("restaurant-container");
             for (let j = 0; j < 3; j++) {
@@ -219,7 +230,12 @@ const getRestaurants = async (search_text = "") => {
 
                 const i_heart = document.createElement("i");
                 i_heart.classList.add("fa-regular", "fa-heart");
+                i_heart.setAttribute("data-id", restaurant._id);
                 
+                if (favourite_restaurant_id && restaurant._id === favourite_restaurant_id) {
+                    i_heart.classList.add("activate-heart");
+                }
+
                 const restaurant_box_description = document.createElement("div");
                 restaurant_box_description.classList.add("restaurant-box-description");
 
@@ -263,12 +279,25 @@ const getRestaurants = async (search_text = "") => {
             };
         };
 
-        // Fa-heart icon activation after clicking
+        // Fa-heart icon activation after clicking on the heart icon
         let favourite_restaurant = null;
-
+        
         const restaurant_box_header = document.querySelectorAll(".restaurant-box-header i");
         restaurant_box_header.forEach((heart) => {
-            heart.addEventListener('click', () => {
+            heart.addEventListener('click', async () => {
+                const restaurant_id = heart.getAttribute("data-id");
+
+                document.querySelectorAll(".restaurant-box-header i.activate-heart").forEach(activeHeart => {
+                    activeHeart.classList.remove("activate-heart");
+                });
+
+                let restaurant_name;
+                if (restaurant_id) {
+                    restaurant_name = await getRestaurantNameById(restaurant_id);
+                }
+
+                console.log(restaurant_name);
+                
                 if (favourite_restaurant && favourite_restaurant !== heart) {
                     favourite_restaurant.classList.remove("activate-heart");
                 }
@@ -276,8 +305,24 @@ const getRestaurants = async (search_text = "") => {
                 const isActive = heart.classList.toggle("activate-heart");
 
                 favourite_restaurant = isActive ? heart : null;
-
-                console.log(favourite_restaurant);
+                
+                try {
+                    const token = localStorage.getItem("token");
+                    const options = {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            favouriteRestaurant: isActive ? restaurant_id : null
+                        })
+                    }
+                    const result = await fetchData(`${apiUrl}/users`, options);
+                    console.log("Updated favorite restaurant:", result.data.favouriteRestaurant);
+                } catch (error) {
+                    console.error(error);
+                }
             });
         })
         
@@ -344,17 +389,11 @@ const getRestaurants = async (search_text = "") => {
                 const menu_box = [];
                 
                 weekly_menu.days.forEach((data, index) => {
-                    console.log(data);
-                    // test for creating li elements
+                    // console.log(data);
                     const li = document.createElement("li");
                     li.textContent = data?.date;
                     li.classList.add("date-list-item");
                     li.dataset.index = index;
-                    // test for creating li elements
-
-                    // Set date text
-                    // const list_item = information_date_li[index + 1];
-                    // if (list_item) list_item.textContent = data?.date;
 
                     information_date_ul.append(li);
     
@@ -454,6 +493,7 @@ const getWeeklyMenu = async (restaurantId, lang = "en") => {
 console.log(apiUrl);
 
 const createAccount = async () => {
+    const signup_username = document.getElementById("signup-username").value;
     const signup_email = document.getElementById("signup-email").value;
     const signup_password = document.getElementById("signup-password").value;
     const signup_password_confirmation = document.getElementById("signup-password-confirmation").value;
@@ -474,13 +514,14 @@ const createAccount = async () => {
         return;
     }
 
-    // console.log("Email:", signup_email);
-    // console.log("Password:", signup_password);
+    console.log("Username:", signup_username);
+    console.log("Email:", signup_email);
+    console.log("Password:", signup_password);
     
     const options = {
         method: "POST",
         body: JSON.stringify({
-            "username": signup_email,
+            "username": signup_username,
             "password": signup_password,
             "email": signup_email
         }),
@@ -492,23 +533,47 @@ const createAccount = async () => {
     try {
         const response = await fetch(`${apiUrl}/users`, options);
 
+        console.log(response);
+
         if (!response.ok) {
             const errorData = await response.json();
             if (errorData.message && errorData.message.toLowerCase().includes("already exists")) {
                 const email_field = document.querySelector(".signup-email");
                 const existing_error = email_field.querySelector("p");
                 if (!existing_error) {
-                    const p_user_exists = document.createElement("p");
-                    p_user_exists.innerHTML = "This email is already taken.";
-                    p_user_exists.style.color = "red";
-                    signup_email_div.insertBefore(p_user_exists, signup_email_div.querySelector("input"));
+                    const p_email_exists = document.createElement("p");
+                    p_email_exists.innerHTML = "This email is already taken.";
+                    p_email_exists.style.color = "red";
+                    signup_email_div.insertBefore(p_email_exists, signup_email_div.querySelector("input"));
                 }
             } else {
                 console.error("Error creating account:", errorData);
             }
         } else {
-            // const data = await response.json();
             console.log("Account created successfully:", response);
+
+            try {
+                const options = {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "username": signup_username,
+                        "password": signup_password,
+                    }),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            
+                const data = await fetchData(`${apiUrl}/auth/login`, options);
+
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("username", data.data.username);
+
+                logged_in(data.data.username);
+
+            } catch (error) {
+                console.error(error);
+            }
             removeAccountClasses();
         }
     } catch (error) {
@@ -523,7 +588,7 @@ signup_data_form.addEventListener("submit", (e) => {
 });
 
 const login = async () => {
-    const login_email = document.getElementById("login-email").value;
+    const login_username = document.getElementById("login-username").value;
     const login_password = document.getElementById("login-password").value;
 
     const login_password_div = document.querySelector(".login-password");
@@ -536,7 +601,7 @@ const login = async () => {
     const options = {
         method: "POST",
         body: JSON.stringify({
-            "username": login_email,
+            "username": login_username,
             "password": login_password,
         }),
         headers: {
@@ -566,7 +631,7 @@ const login = async () => {
             localStorage.setItem("token", data.token);
             localStorage.setItem("username", data.data.username);
 
-            logged_in_navbar(data.data.username);
+            logged_in();
 
             removeAccountClasses();
         }
@@ -581,8 +646,23 @@ login_data_form.addEventListener("submit", (e) => {
     login();
 });
 
+const getRestaurantNameById = async (restaurant_id) => {
+    try {
+        const restaurant = await fetchData(`${apiUrl}/restaurants/${restaurant_id}`);
+        if (restaurant && restaurant.name) {
+            return restaurant.name;
+        } else {
+            console.error("Restaurant not found or missing name.");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error fetching restaurant by id", error);
+        return null;
+    }
+}
+
 // after login/signup
-const logged_in_navbar = (username) => {
+const logged_in = async (username) => {
     const navbar = document.querySelector(".navbar");
     const navbar_login = document.getElementById("navbar-login");
 
@@ -590,12 +670,43 @@ const logged_in_navbar = (username) => {
         navbar_login.remove();
     }
 
-    // If the user have a profile pictrue change this i element into img.
-    const user_icon = document.createElement("i");
-    user_icon.className = "fa-solid fa-circle-user";
+    const token = localStorage.getItem("token");
+    const data = await fetchData(`${apiUrl}/users/token`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+
+
+    console.log(data);
+
+    getRestaurants("", data.favouriteRestaurant);
+
+    const navbar_icon_div = document.createElement("div");
+    navbar_icon_div.className = "navbar-icon";
+
+    let user_icon;
+    let profile_icon;
+    if (data?.avatar) {
+        user_icon = document.createElement("img");
+        user_icon.src = `${imgUrl}/${data.avatar}`;
+        user_icon.alt = "navbar-user-avatar";
+
+        profile_icon = document.createElement("img");
+        profile_icon.src = `${imgUrl}/${data.avatar}`;
+        profile_icon.alt = "profile-user-avatar";
+    } else {
+        user_icon = document.createElement("i");
+        user_icon.className = "fa-solid fa-circle-user";
+
+        profile_icon = document.createElement("i");
+        profile_icon.className = "fa-solid fa-circle-user";
+    }
+
+    navbar_icon_div.append(user_icon);
 
     const username_text = document.createElement("p");
-    username_text.textContent = username;
+    username_text.textContent = data.username;
 
     const logout_btn = document.createElement("button");
     logout_btn.textContent = "Logout";
@@ -610,19 +721,47 @@ const logged_in_navbar = (username) => {
     const navbar_logged_in = document.createElement("div");
     navbar_logged_in.className = "navbar-logged-in";
     navbar_logged_in.setAttribute("id", "navbar-logged-in");
-    navbar_logged_in.append(user_icon);
+    navbar_logged_in.append(navbar_icon_div);
     navbar_logged_in.append(username_text);
-    navbar_logged_in.append(logout_btn);
+    // navbar_logged_in.append(logout_btn);
 
-    navbar_logged_in.addEventListener('click', () => {
+    navbar_logged_in.addEventListener('click', async () => {
         const profile = document.getElementById("profile");
         profile.classList.toggle("open-profile-section");
 
         const profile_container = document.getElementById("profile-container");
         profile_container.classList.toggle("open-profile-container");
 
+        const profile_picture = document.querySelector(".profile-picture");
+        const profile_upload = document.querySelector(".profile-upload");
+
+        const profile_info = document.querySelector(".profile-info");
+
+        const profile_info_username = document.getElementById("profile-username");
+        profile_info_username.value = data.username;
+
+        const profile_info_email = document.getElementById("profile-email");
+        profile_info_email.value = data.email;
+
+        getRestaurants("", data.favouriteRestaurant);
+
+        console.log("current data:",data);
+
+        const profile_info_favourite_restaurant = document.getElementById("profile-favourite-restaurant");
+        profile_info_favourite_restaurant.textContent = await getRestaurantNameById(data.favouriteRestaurant);
+
         const close_profile_bOverlay = document.getElementById("profile-box-overlay");
         close_profile_bOverlay.classList.toggle("show-profile-box-overlay");
+
+        close_profile_bOverlay.addEventListener("click", removeProfileClasses);
+
+        const profile_picture_h2 = document.createElement("h2");
+        profile_picture_h2.textContent = data.username;
+
+        const profile_picture_h2_exist = document.querySelector(".profile-picture h2");
+        if (profile_picture_h2_exist) profile_picture_h2_exist.remove();
+
+        profile_picture.append(profile_picture_h2);
 
         const logout_btn = document.createElement("button");
         logout_btn.textContent = "Logout";
@@ -633,12 +772,26 @@ const logged_in_navbar = (username) => {
             
             window.location.reload();
         };
-        
+
         if (logout_btn) {
             // logout_btn.remove();
         } else {
             // profile_container.append(logout_btn);
         }
+
+        profile_upload.insertBefore(profile_icon, document.querySelector(".profile-upload input"));
+
+
+        const profile_account_delete = document.querySelector(".profile-account-deletation");
+        const delete_btn = document.createElement("button");
+        delete_btn.setAttribute("id", "delete-account-btn");
+        delete_btn.textContent = "Delete My Account";
+
+        profile_account_delete.innerHTML = "";
+        profile_account_delete.append(delete_btn);
+
+        delete_btn.addEventListener("click", delete_account);
+
     });
 
     navbar.append(navbar_logged_in);
@@ -649,15 +802,94 @@ window.addEventListener("DOMContentLoaded", () => {
     const username = localStorage.getItem("username");
 
     if (token && username) {
-        logged_in_navbar(username);
+        logged_in(username);
     }
 });
 
-// const navbar_logged_in = document.getElementById("navbar-logged-in");
+const picture_file = document.getElementById("picture-file");
+const upload_avatar = async () => {
+    const file = picture_file.files[0];
 
-// navbar_logged_in.addEventListener('click', () => {
+    if (!file) {
+        alert("Please select an image.");
+        return;
+    }
 
-// });
+    const form_data = new FormData();
+    form_data.append("avatar", file);
+
+    const token = localStorage.getItem("token");
+    
+    const options = {
+        method: "POST",
+        body: form_data,
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    
+    try {
+        const result = await fetchData(`${apiUrl}/users/avatar`, options);
+
+        console.log("Upload successful:", result);
+
+        const navbar_icon = document.querySelector(".navbar-icon");
+        navbar_icon.innerHTML = "";
+
+        const profile_upload = document.querySelector(".profile-upload");
+
+        const profile_user_icon = document.querySelector(".profile-upload .fa-solid.fa-circle-user");
+        if (profile_user_icon) profile_user_icon.remove();
+
+        // deletes the current user's img replace with a new one (img)
+        const profile_user_img = document.querySelector(".profile-upload img");
+        if (profile_user_img) profile_user_img.remove();
+
+        const navbar_img = document.createElement("img");
+        const profile_img = document.createElement("img");
+        if (result.data.avatar) {
+            navbar_img.src = `${imgUrl}/${result.data.avatar}`;
+            navbar_img.style.display = "block";
+            navbar_icon.append(navbar_img);
+
+            profile_img.src = `${imgUrl}/${result.data.avatar}`;
+            profile_img.style.display = "block";
+            profile_upload.insertBefore(profile_img, document.querySelector(".profile-upload input"));
+        }
+
+    } catch (error) {
+        console.error("Error uploading avatar:", error);
+    }
+}
+
+picture_file.addEventListener("change", upload_avatar);
+
+const delete_account = async () => {
+
+    const token = localStorage.getItem("token");
+    if (!confirm("Are you sure you want to delete your account? This action is irreversible!")) {
+        return;
+    }
+
+    const options = {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+    
+    try {
+        const response = await fetch(`${apiUrl}/users`, options);
+
+        console.log("Deleted:", response);
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        window.location.reload();
+    } catch (error) {
+        console.error("Error deleting account:", error);
+    }
+}
 
 const getToken = async () => {
     try {

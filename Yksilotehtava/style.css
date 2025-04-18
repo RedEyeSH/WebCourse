@@ -84,13 +84,17 @@ i {
     align-items: center;
     gap: 10px;
     border: 3px solid white;
-    padding: 10px 15px;
+    padding: 5px 10px;
     border-radius: 30px;
     transition: 0.25s;
 }
 
 .navbar-login:hover {
     background-color: white;
+}
+
+.navbar-login i {
+    font-size: 32px;
 }
 
 .navbar-login:hover i, .navbar-login:hover p {
@@ -103,7 +107,7 @@ i {
     align-items: center;
     gap: 10px;
     border: 3px solid white;
-    padding: 10px 15px;
+    padding: 5px 10px;
     border-radius: 30px;
     transition: 0.25s;
 }
@@ -112,8 +116,30 @@ i {
     background-color: white;
 }
 
+.navbar-logged-in i {
+    font-size: 40px;
+}
+
 .navbar-logged-in:hover i, .navbar-logged-in:hover p {
     color: #2D60F2;
+}
+
+.navbar-icon {
+    width: 40px;
+    height: 40px;
+}
+
+.navbar-logged-in img {
+    width: 100%;
+    height: 100%;
+    object-position: center;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.navbar-logged-in:hover img {
+    border: 2px solid #2D60F2;
 }
 /* Navbar ends here */
 
@@ -201,7 +227,7 @@ i {
     border-radius: 5px;
 }
 
-.login-form form, .login-email, .login-password {
+.login-form form, .login-username, .login-email, .login-password {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -216,16 +242,16 @@ i {
     cursor: pointer;
 }
 
-.login-email input, .login-password input {
+.login-username input, .login-email input, .login-password input {
     border: 2px solid black;
     transition: 0.25s;
 }
 
-.login-email input:hover, .login-password input:hover {
+.login-username input:hover, .login-email input:hover, .login-password input:hover {
     border: 2px solid #16398d;
 }
 
-.login-email input:focus, .login-password input:focus {
+.login-username input:focus, .login-email input:focus, .login-password input:focus {
     border: 2px solid #2D60FF;
 }
 
@@ -277,10 +303,10 @@ i {
     cursor: pointer;
 }
 
-.signup-form form, .signup-email, .signup-password, .signup-password-confirmation {
+.signup-form form, .signup-username, .signup-email, .signup-password, .signup-password-confirmation {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
 }
 
 /* .signup-date {
@@ -292,15 +318,15 @@ i {
     border-radius: 5px;
 }
 
-.signup-email input, .signup-password input, .signup-password-confirmation input {
+.signup-username input, .signup-email input, .signup-password input, .signup-password-confirmation input {
     border: 2px solid black;
 }
 
-.signup-email input:focus, .signup-password input:focus, .signup-password-confirmation input:focus {
+.signup-username input:focus, .signup-email input:focus, .signup-password input:focus, .signup-password-confirmation input:focus {
     border: 2px solid #2D60FF;
 }
 
-.signup-email input:hover, .signup-password input:hover, .signup-password-confirmation input:hover {
+.signup-username input:hover, .signup-email input:hover, .signup-password input:hover, .signup-password-confirmation input:hover {
     border: 2px solid #16398d;
 }
 
@@ -384,14 +410,12 @@ i {
     width: 100%;
     height: 100%;
     padding: 2rem;  
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: center;
     transition: 0.5s;
     opacity: 0;
     transform: translateX(100%);
-
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 .open-profile-container {
@@ -399,15 +423,87 @@ i {
     opacity: 1;
 }
 
-.profile-picture i {
-    font-size: 72px;
-    position: relative;
+.profile-information {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
 }
 
-.profile-picture i input {
+.profile-back {
+    display: flex;
+    justify-content: left;
+}
+
+.profile-back p {
+    text-decoration: underline;
+}
+
+.profile-picture {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.profile-picture i {
+    font-size: 100px;
+}
+
+.profile-upload {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    display: inline-block;
+    font-size: 60px;
+    cursor: pointer;
+}
+
+.profile-upload img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    border: 2.5px solid white;
+    border-radius: 50%;
+}
+
+.profile-upload input[type="file"] {
+    display: none;
+}
+
+#camera-icon {
     position: absolute;
-    left: 0;
-    bottom: 0;
+    bottom: 0px;
+    right: 0;
+    font-size: 24px;
+    background: white;
+    border-radius: 50%;
+    padding: 5px;
+    color: #333;
+}
+
+.profile-info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.profile-info input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+
+#delete-account-btn {
+    cursor: pointer;
+    color: white;
+    background-color: red;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 500;
 }
 
 .show-profile-box-overlay {
@@ -516,11 +612,13 @@ i {
     top: 120%;
     left: 0;
     width: 100%;
-    background-color: #2D60FF;
+    /* background-color: #2D60FF; */
+    background-color: white;
     z-index: 50;
     border-radius: 5px;
     max-height: 200px;
     overflow-y: hidden;
+    border: 1px solid #ccc;
     animation: open-dropdown 0.25s forwards;
 }
 
@@ -530,7 +628,7 @@ i {
 
 .search-option-box li {
     cursor: pointer;
-    color: white;
+    /* color: white; */
     padding: 5px;
     border-radius: 5px;
     font-size: 14px;
@@ -540,6 +638,7 @@ i {
 
 .search-option-box li:hover {
     background-color: #2c56d1;
+    color: white;
 }
 
 .search-magnifying-glass {

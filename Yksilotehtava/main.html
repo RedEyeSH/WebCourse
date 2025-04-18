@@ -37,10 +37,14 @@
                     <i class="fa-solid fa-xmark" id="x-close-form"></i>
                 </div>
                 <form action="#">
-                    <div class="login-email">
+                    <div class="login-username">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" placeholder="Enter username" required>
+                    </div>
+                    <!-- <div class="login-email">
                         <label for="login-email">Email</label>
                         <input type="email" id="login-email" placeholder="Email" required>
-                    </div>
+                    </div> -->
                     <div class="login-password">
                         <label for="login-password">Password</label>
                         <input type="password" id="login-password" placeholder="Enter password" required>
@@ -67,6 +71,10 @@
                     <i class="fa-solid fa-xmark" id="x-close-form"></i>
                 </div>
                 <form action="#">
+                    <div class="signup-username">
+                        <label for="signup-username">Username</label>
+                        <input type="text" id="signup-username" placeholder="Username" required>
+                    </div>
                     <div class="signup-email">
                         <label for="signup-email">Email</label>
                         <input type="email" id="signup-email" placeholder="Email" required>
@@ -94,19 +102,26 @@
     <div class="box-overlay" id="box-overlay"></div> <!-- Box overlay -->
     <!-- Account forms ends here -->
 
-    
     <!-- Profile section starts here -->
     <section class="profile" id="profile">
         <div class="profile-container" id="profile-container">
-            <div class="profile-picture">
-                <i class="fa-solid fa-circle-user" id="profile-picture">
-                    <!-- <p>test</p> -->
-                    <!-- <input type="file" value="change"> -->
-                </i>
-                <img src="" alt="">
+            <div class="profile-back">
+                <p>Go back</p>
             </div>
-            <div class="profile-username">
-                <p>testingaccount@gmail.com</p>
+            <div class="profile-information">
+                <h1>My Profile</h1>
+                <div class="profile-picture">
+                    <label class="profile-upload">
+                        <input type="file" accept="image/*" id="picture-file">
+                        <i class="fa-solid fa-camera" id="camera-icon"></i>
+                    </label>
+                </div>
+                <div class="profile-info">
+                    <p>Username <input type="text" id="profile-username" disabled></p>
+                    <p>Email <input type="text" id="profile-email" disabled></p>
+                    <p>Favourite restaurant -> <span id="profile-favourite-restaurant"></span></p>
+                </div>
+                <div class="profile-account-deletation"></div>
             </div>
         </div>
     </section>
