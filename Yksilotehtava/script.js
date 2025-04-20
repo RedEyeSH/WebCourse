@@ -320,7 +320,7 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
                 restaurant_box_description.classList.add("restaurant-box-description");
 
                 const p_description = document.createElement("p");
-                p_description.innerHTML = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque officia aperiam ratione consectetur pariatur quasi quis et animi esse laborum consequatur hic, officiis libero accusantium quaerat asperiores non doloribus numquam."
+                p_description.innerHTML = `${restaurant.company}`
 
                 const restaurant_box_info = document.createElement("div");
                 restaurant_box_info.classList.add("restaurant-box-info");
