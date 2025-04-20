@@ -1,7 +1,23 @@
-import { fetchData } from './lib/fetchData.js';
 "use strict";
+import { fetchData } from './lib/fetchData.js';
 
-// Account login/signup setup starts here
+// Smooth scrolling for navbar links
+document.querySelectorAll('.navbar a').forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const targetId = link.getAttribute('href').substring(1); // Get the target section ID
+        const targetSection = document.getElementById(targetId);
+
+        if (targetSection) {
+            targetSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+    });
+});
+
 const login_button = document.getElementById("navbar-login");
 login_button.addEventListener('click', () => {
     document.getElementById("account").classList.toggle("open-account-section");
@@ -58,6 +74,21 @@ function removeProfileClasses() {
 
     const close_profile_bOverlay = document.getElementById("profile-box-overlay");
     close_profile_bOverlay.classList.remove("show-profile-box-overlay");
+
+    // removes also profile password classes if open
+    removeProfilePasswordClasses();
+}    
+
+function removeProfilePasswordClasses() {
+    const profile_password = document.getElementById("profile-password");
+    profile_password.classList.remove("open-profile-password");
+    
+    const profile_password_container = document.getElementById("profile-password-container");
+    profile_password_container.classList.remove("open-profile-password-container");
+
+    const change_password_overlay = document.getElementById("change-password-overlay");
+    change_password_overlay.classList.remove("show-change-password-overlay");
+
 }
 
 const close_form = document.querySelectorAll("#x-close-form");
@@ -68,8 +99,12 @@ close_form.forEach((button) => {
 const close_form_bOverlay = document.getElementById("box-overlay");
 close_form_bOverlay.addEventListener('click', removeAccountClasses);
 
-// Account login/signup setup ends here
+const navbar_menu = document.querySelector(".navbar-menu");
+navbar_menu.addEventListener("click", () => {
+    document.querySelector(".navbar-box").classList.toggle("open-navbar-box");
+});
 
+// api urls
 const apiUrl = "https://media2.edu.metropolia.fi/restaurant/api/v1";
 const imgUrl = "https://media2.edu.metropolia.fi/restaurant/uploads";
 
@@ -131,13 +166,9 @@ const create_dropdown = (data_type, button, data, select_box) => {
                 // console.log(selected_filters);
 
                 // call getRestaurants to update displayed restaurants
-                const token = localStorage.getItem("token");
-                const userData = await fetchData(`${apiUrl}/users/token`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-                getRestaurants("", userData.favouriteRestaurant);
+                const data = await getUserByToken();
+
+                getRestaurants("", data.favouriteRestaurant);
             });
             ul.append(li);
         });
@@ -190,6 +221,8 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
         const allRestaurants = await fetchData(`${apiUrl}/restaurants`);
         if (!allRestaurants) throw new Error("Failed to fetch restaurants.");
 
+        allRestaurants.sort((a, b) => a.name.localeCompare(b.name));
+
         const restaurant_section = document.querySelector(".restaurant");
         restaurant_section.innerHTML = "";
 
@@ -212,6 +245,8 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
 
         let currentIndex = 0;
 
+        const userData = await getUserByToken();
+
         for (let i = 0; i < container_count; i++) {
             // Creating 3 boxes per 1 restaurant container div
             const restaurant_container = document.createElement("div");
@@ -231,12 +266,54 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
                 const h2_name_city = document.createElement("h2");
                 h2_name_city.innerHTML = `${restaurant.name}, ${restaurant.city}`;
 
-                const i_heart = document.createElement("i");
-                i_heart.classList.add("fa-regular", "fa-heart");
-                i_heart.setAttribute("data-id", restaurant._id);
+                // Conditionally append the heart icon if the user is logged in
+                if (userData) {
+                    const i_heart = document.createElement("i");
+                    i_heart.classList.add("fa-regular", "fa-heart");
+                    i_heart.setAttribute("data-id", restaurant._id);
 
-                if (favourite_restaurant_id && restaurant._id === favourite_restaurant_id) {
-                    i_heart.classList.add("activate-heart");
+                    if (favourite_restaurant_id && restaurant._id === favourite_restaurant_id) {
+                        i_heart.classList.add("activate-heart");
+                    }
+
+                    // Add click event listener to the heart icon
+                    i_heart.addEventListener('click', async () => {
+                        const restaurant_id = i_heart.getAttribute("data-id");
+
+                        document.querySelectorAll(".restaurant-box-header i.activate-heart").forEach(activeHeart => {
+                            activeHeart.classList.remove("activate-heart");
+                        });
+
+                        const isActive = i_heart.classList.toggle("activate-heart");
+
+                        try {
+                            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+                            const options = {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    favouriteRestaurant: isActive ? restaurant_id : null
+                                })
+                            };
+                            const result = await fetchData(`${apiUrl}/users`, options);
+                            console.log("Updated favorite restaurant:", result.data.favouriteRestaurant);
+
+                            // Update the profile favorite restaurant dynamically
+                            const profile_info_favourite_restaurant = document.getElementById("profile-favourite-restaurant");
+                            const restaurant_name = await getRestaurantNameById(restaurant_id);
+                            profile_info_favourite_restaurant.textContent = restaurant_name;
+                            
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    });
+
+                    restaurant_box_header.append(h2_name_city, i_heart);
+                } else {
+                    restaurant_box_header.append(h2_name_city);
                 }
 
                 const restaurant_box_description = document.createElement("div");
@@ -264,7 +341,7 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
                 const h3_open = document.createElement("h3");
                 h3_open.innerHTML = "Open";
                 
-                restaurant_box_header.append(h2_name_city, i_heart);
+                // restaurant_box_header.append(h2_name_city, i_heart);
                 restaurant_box_description.append(p_description);
                 restaurant_box_info_address.append(i_location, h4_address_postalCode);
                 restaurant_box_info_visit.append(h3_open);
@@ -281,58 +358,6 @@ const getRestaurants = async (search_text = "", favourite_restaurant_id = null) 
                 currentIndex++;
             };
         };
-
-        // Fa-heart icon activation after clicking on the heart icon
-        let favourite_restaurant = null;
-        
-        const restaurant_box_header = document.querySelectorAll(".restaurant-box-header i");
-        restaurant_box_header.forEach((heart) => {
-            heart.addEventListener('click', async () => {
-                const restaurant_id = heart.getAttribute("data-id");
-
-                document.querySelectorAll(".restaurant-box-header i.activate-heart").forEach(activeHeart => {
-                    activeHeart.classList.remove("activate-heart");
-                });
-
-                // let restaurant_name;
-                // if (restaurant_id) {
-                //     restaurant_name = await getRestaurantNameById(restaurant_id);
-                // }
-
-                // console.log(restaurant_name);
-                
-                if (favourite_restaurant && favourite_restaurant !== heart) {
-                    favourite_restaurant.classList.remove("activate-heart");
-                }
-
-                const isActive = heart.classList.toggle("activate-heart");
-
-                favourite_restaurant = isActive ? heart : null;
-                
-                try {
-                    const token = localStorage.getItem("token");
-                    const options = {
-                        method: "PUT",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            favouriteRestaurant: isActive ? restaurant_id : null
-                        })
-                    }
-                    const result = await fetchData(`${apiUrl}/users`, options);
-                    console.log("Updated favorite restaurant:", result.data.favouriteRestaurant);
-
-                    // handles the profile favourite restaurant update
-                    const profile_info_favourite_restaurant = document.getElementById("profile-favourite-restaurant");
-                    const restaurant_name = await getRestaurantNameById(restaurant_id);
-                    profile_info_favourite_restaurant.textContent = restaurant_name;
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        })
 
         // Opens the restaurant's information after pressing a "Open" button
         const information = document.getElementById("information");
@@ -547,10 +572,6 @@ const createAccount = async () => {
         return;
     }
 
-    console.log("Username:", signup_username);
-    console.log("Email:", signup_email);
-    console.log("Password:", signup_password);
-    
     const options = {
         method: "POST",
         body: JSON.stringify({
@@ -623,6 +644,7 @@ signup_data_form.addEventListener("submit", (e) => {
 const login = async () => {
     const login_username = document.getElementById("login-username").value;
     const login_password = document.getElementById("login-password").value;
+    const remember_me = document.getElementById("remember-me").checked;
 
     const login_password_div = document.querySelector(".login-password");
 
@@ -662,8 +684,16 @@ const login = async () => {
             const data = await response.json();
             console.log("Logged in successfully!", data);
 
-            localStorage.setItem("token", data.token);
-            localStorage.setItem("username", data.data.username);
+            if (remember_me) {
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("username", data.data.username);
+            } else {
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("username", data.data.username);
+            }
+
+            // localStorage.setItem("token", data.token);
+            // localStorage.setItem("username", data.data.username);
 
             logged_in();
 
@@ -697,20 +727,24 @@ const getRestaurantNameById = async (restaurant_id) => {
 
 // after login/signup
 const logged_in = async (username) => {
+    const data = await getUserByToken();
+
+    if (!data) {
+        console.error("User data is null. Logging out...");
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+        sessionStorageStorage.removeItem("token");
+        sessionStorage.removeItem("username");
+        window.location.reload();
+        return;
+    }
+
     const navbar = document.querySelector(".navbar");
     const navbar_login = document.getElementById("navbar-login");
 
     if (navbar_login) {
         navbar_login.remove();
     }
-
-    const token = localStorage.getItem("token");
-
-    const data = await fetchData(`${apiUrl}/users/token`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    });
 
     // updates user's favourite restaurant
     getRestaurants("", data.favouriteRestaurant);
@@ -724,6 +758,149 @@ const logged_in = async (username) => {
     } else {
         profile_info_favourite_restaurant.textContent = "No favourite restaurant";   
     }
+
+    // Open the information section from profile user's favourite restaurant
+    profile_info_favourite_restaurant.addEventListener("click", async () => {
+        const data = await getUserByToken();
+    
+        if (!data || !data.favouriteRestaurant) {
+            console.error("No favorite restaurant found.");
+            return;
+        }
+    
+        try {
+            // Fetch the favorite restaurant's details
+            const restaurant = await fetchData(`${apiUrl}/restaurants/${data.favouriteRestaurant}`);
+            if (!restaurant) {
+                console.error("Failed to fetch favorite restaurant details.");
+                return;
+            }
+    
+            // Open the information section
+            const information = document.getElementById("information");
+            const information_container = document.getElementById("information-container");
+    
+            // Animation for opening the information section
+            information.classList.add("open-information-section");
+            information_container.classList.add("open-information-container");
+            document.getElementById("information-box-overlay").classList.add("show-information-box-overlay");
+    
+            // Populate the information section with restaurant details
+            const information_header_h2 = document.querySelector("#information-header h2");
+            information_header_h2.innerHTML = `${restaurant.name}, ${restaurant.city}`;
+    
+            const information_details = document.querySelector(".information-details");
+            information_details.innerHTML = `
+                <h4>${restaurant.name}</h4>
+                <p>${restaurant.address}</p>
+                <p>${restaurant.postalCode}, ${restaurant.city}</p>
+                <p>${restaurant.company}, ${restaurant.phone}</p>
+            `;
+    
+            // Fetch and display the weekly menu
+            const information_menu = document.querySelector(".information-menu");
+            information_menu.textContent = ""; // Clear previous menu content
+    
+            const restaurant_id = restaurant._id;
+            const weekly_menu = await getWeeklyMenu(restaurant_id, "fi"); // Fetch menu in Finnish
+    
+            if (weekly_menu && weekly_menu.days && weekly_menu.days.length > 0) {
+                const information_date_ul = document.querySelector(".information-date ul");
+                information_date_ul.innerHTML = ""; // Clear previous dates
+    
+                const header_li = document.createElement("li");
+                header_li.textContent = "This week";
+                information_date_ul.append(header_li);
+    
+                const menu_box = [];
+    
+                weekly_menu.days.forEach((data, index) => {
+                    const li = document.createElement("li");
+                    li.textContent = data?.date;
+                    li.classList.add("date-list-item");
+                    li.dataset.index = index;
+    
+                    information_date_ul.append(li);
+    
+                    // Create menu div
+                    const div = document.createElement("div");
+                    div.classList.add("information-menu-list");
+                    div.dataset.index = index;
+    
+                    const h3_date = document.createElement("h3");
+                    h3_date.textContent = data?.date;
+    
+                    div.append(h3_date);
+    
+                    data.courses.forEach((course) => {
+                        const meal_description = document.createElement("p");
+                        meal_description.textContent = `
+                            ${course.name ? course?.name : "No menu available"} - 
+                            ${course.price ? course?.price : "Unset Price"} - 
+                            ${course.diets ? course.diets : "Unset Diets"}
+                        `;
+                        div.append(meal_description);
+                    });
+    
+                    menu_box.push(div);
+                    information_menu.append(div);
+                });
+    
+                const information_date_li = document.querySelectorAll(".information-date li");
+    
+                information_date_li[0].classList.add("activate-li-date");
+    
+                information_date_li.forEach((li, element_index) => {
+                    li.addEventListener("click", () => {
+                        information_date_li.forEach(li => li.classList.remove("activate-li-date"));
+                        li.classList.toggle("activate-li-date");
+    
+                        if (element_index === 0) {
+                            menu_box.forEach(div => div.style.display = "block");
+                        } else {
+                            menu_box.forEach((div, menu_box_index) => {
+                                div.style.display = (menu_box_index === element_index - 1) ? "block" : "none";
+                            });
+                        }
+                    });
+                });
+            } else {
+                const no_menu_message = document.createElement("p");
+                no_menu_message.classList.add("no-menu-message");
+                no_menu_message.textContent = "No menu available for this restaurant.";
+                information_menu.append(no_menu_message);
+            }
+
+            // Handle the map for the restaurant
+            const information_map = document.querySelector(".information-map");
+            information_map.innerHTML = "";
+    
+            const mapDiv = document.createElement("div");
+            mapDiv.setAttribute("id", "map");
+            mapDiv.style.height = "600px";
+            information_map.appendChild(mapDiv);
+    
+            const setMap = L.map("map").setView([restaurant.location.coordinates[1], restaurant.location.coordinates[0]], 13);
+    
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }).addTo(setMap);
+    
+            L.marker([restaurant.location.coordinates[1], restaurant.location.coordinates[0]])
+                .addTo(setMap)
+                .bindPopup(`
+                    <h3>${restaurant.name}</h3>
+                    <p>${restaurant.address}</p>
+                    <p>${restaurant.postalCode}, ${restaurant.city}</p>
+                    <p>${restaurant.company}, ${restaurant.phone}</p>
+                `)
+                .openPopup();
+
+            removeProfileClasses();
+        } catch (error) {
+            console.error("Error opening favorite restaurant information:", error);
+        }
+    });
 
     const navbar_icon_div = document.createElement("div");
     navbar_icon_div.className = "navbar-icon";
@@ -762,12 +939,8 @@ const logged_in = async (username) => {
     navbar_logged_in.append(username_text);
 
     navbar_logged_in.addEventListener('click', async () => {
-        const token = localStorage.getItem("token");
-        const data = await fetchData(`${apiUrl}/users/token`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
+        removeProfilePasswordClasses();
+        const data = await getUserByToken();
         
         const profile = document.getElementById("profile");
         profile.classList.toggle("open-profile-section");
@@ -776,9 +949,6 @@ const logged_in = async (username) => {
         profile_container.classList.toggle("open-profile-container");
 
         const profile_picture = document.querySelector(".profile-picture");
-        // const profile_upload = document.querySelector(".profile-upload");
-
-        const profile_info = document.querySelector(".profile-info");
 
         const profile_info_username = document.getElementById("profile-username");
         profile_info_username.value = data.username;
@@ -802,21 +972,17 @@ const logged_in = async (username) => {
         profile_picture.append(profile_picture_h2);
 
         const profile_logout = document.getElementById("profile-logout");
-        profile_logout.onclick = () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            
-            window.location.reload();
-        };
+        profile_logout.addEventListener('click', () => logout());
 
         // profile_upload.insertBefore(profile_icon, document.querySelector(".profile-upload input"));
 
         const profile_username_input = document.getElementById("profile-username");
         const profile_email_input = document.getElementById("profile-email");
         
-        const cancel_btn = document.getElementById("profile-cancel-btn");
-        const edit_btn = document.getElementById("profile-edit-btn");
         const save_btn = document.getElementById("profile-save-btn");
+        const cancel_btn = document.getElementById("profile-cancel-btn");
+        const change_password_btn = document.getElementById("profile-password-btn");
+        const edit_btn = document.getElementById("profile-edit-btn");
         const delete_btn = document.getElementById("profile-delete-btn");
         
         let original_username = `${data.username}`;
@@ -831,6 +997,7 @@ const logged_in = async (username) => {
 
             save_btn.style.display = "block";
             cancel_btn.style.display = "block";
+            change_password_btn.style.display = "none";
             edit_btn.style.display = "none";
             delete_btn.style.display = "none";
         });
@@ -844,6 +1011,7 @@ const logged_in = async (username) => {
 
             save_btn.style.display = "none";
             cancel_btn.style.display = "none";
+            change_password_btn.style.display = "block";
             edit_btn.style.display = "block";
             delete_btn.style.display = "block";
 
@@ -856,7 +1024,7 @@ const logged_in = async (username) => {
         save_btn.addEventListener("click", async () => {
             const new_username = profile_username_input.value.trim();
             const new_email = profile_email_input.value.trim();
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
             try {
                 const options = {
@@ -881,6 +1049,7 @@ const logged_in = async (username) => {
 
                 save_btn.style.display = "none";
                 cancel_btn.style.display = "none";
+                change_password_btn.style.display = "block";
                 edit_btn.style.display = "block";
                 delete_btn.style.display = "block";
 
@@ -901,19 +1070,30 @@ const logged_in = async (username) => {
                 profile_error_message.textContent = "Email or username is already taken.";
             }
         });
+        change_password_btn.addEventListener("click", change_password);
         delete_btn.addEventListener("click", delete_account);
     });
-    navbar.append(navbar_logged_in);
+    const navbar_logo = document.querySelector(".navbar-logo");
+    navbar.insertBefore(navbar_logged_in, navbar_logo);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    const username = localStorage.getItem("username") || sessionStorage.getItem("username");
 
     if (token && username) {
         logged_in(username);
     }
 });
+
+const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("username");
+
+    window.location.reload();
+};
 
 const picture_file = document.getElementById("picture-file");
 
@@ -923,7 +1103,7 @@ const upload_avatar = async () => {
     const form_data = new FormData();
     form_data.append("avatar", file);
 
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     
     const options = {
         method: "POST",
@@ -973,8 +1153,83 @@ const upload_avatar = async () => {
 
 picture_file.addEventListener("change", upload_avatar);
 
+const change_password = async () => {
+    // Opens a profile change password section
+    const profile_password = document.getElementById("profile-password");
+    profile_password.classList.toggle("open-profile-password");
+    
+    const profile_password_container = document.getElementById("profile-password-container");
+    profile_password_container.classList.toggle("open-profile-password-container");
+    
+    const profile_password_close = document.getElementById("profile-password-close");
+    profile_password_close.addEventListener("click", removeProfilePasswordClasses);
+
+    const change_password_overlay = document.getElementById("change-password-overlay");
+    change_password_overlay.classList.toggle("show-change-password-overlay");
+    change_password_overlay.addEventListener("click", removeProfilePasswordClasses);
+
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    
+    const confirm_btn = document.getElementById("profile-change-password");
+    confirm_btn.addEventListener("click", async () => {
+        // Handles the user's passwords
+        const new_password = document.getElementById("profile-new-password").value.trim();
+        const confirm_password = document.getElementById("profile-confirm-password").value.trim();
+        
+        const change_password_message = document.createElement("p"); 
+    
+        const existing_message = profile_password_container.querySelector("p.message");
+        if (existing_message) {
+            existing_message.remove();
+        }
+    
+        if (new_password !== confirm_password) {
+            change_password_message.style.display = "block";
+            change_password_message.style.color = "red";
+            change_password_message.textContent = "New passwords do not match.";
+            return;
+        }
+
+        try {
+            const options = {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    password: new_password
+                })
+            };
+            const data = await fetchData(`${apiUrl}/users`, options);
+            
+            console.log(data);
+
+            change_password_message.textContent = "Password changed successfully.";
+            change_password_message.style.color = "#90EE90";
+            change_password_message.classList.add("message");
+            profile_password_container.appendChild(change_password_message);
+    
+            // Clear the input fields
+            document.getElementById("profile-new-password").value = "";
+            document.getElementById("profile-confirm-password").value = "";
+
+            // After success removes the classes from profile password section
+            setTimeout(() => {
+                removeProfilePasswordClasses();
+            }, 5000);
+        } catch (error) {
+            console.error("Error changing password:", error);
+            change_password_message.textContent = "Failed to change password. Please try again.";
+            change_password_message.style.color = "red";
+            change_password_message.classList.add("message");
+            profile_password_container.appendChild(change_password_message);
+        }
+    });
+}
+
 const delete_account = async () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (!confirm("Are you sure you want to delete your account?")) {
         return;
     }
@@ -999,26 +1254,6 @@ const delete_account = async () => {
         console.error("Error deleting account:", error);
     }
 }
-
-// Handles successful geolocation
-// const handleGeolocationSuccess = (pos, restaurants) => {
-//     const crd = pos.coords;
-//     const setMap = L.map('map').setView([crd.latitude, crd.longitude], 13);
-
-//     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-//     }).addTo(setMap);
-
-//     for (const restaurant of restaurants) {
-//         L.marker([restaurant.location.coordinates[1], restaurant.location.coordinates[0]])
-//             .addTo(setMap)
-//             .bindPopup(`
-//                 <h3>${restaurant.name}</h3>
-//                 <p>${restaurant.address}</p>
-//             `)
-//             .openPopup();
-//     }
-// };
 
 // Handles successful geolocation for a single restaurant
 const handleGeolocationSuccess = (pos, restaurant) => {
@@ -1046,6 +1281,8 @@ const handleGeolocationSuccess = (pos, restaurant) => {
         .bindPopup(`
             <h3>${restaurant.name}</h3>
             <p>${restaurant.address}</p>
+            <p>${restaurant.postalCode}, ${restaurant.city}</p>
+            <p>${restaurant.company}, ${restaurant.phone}</p>
         `)
         .openPopup();
 };
@@ -1091,6 +1328,8 @@ const displayAllRestaurantsOnMap = async () => {
                     .bindPopup(`
                         <h3>${restaurant.name}</h3>
                         <p>${restaurant.address}</p>
+                        <p>${restaurant.postalCode}, ${restaurant.city}</p>
+                        <p>${restaurant.company}, ${restaurant.phone}</p>
                     `);
 
                 // Add to bounds
@@ -1111,16 +1350,25 @@ window.addEventListener("DOMContentLoaded", () => {
     displayAllRestaurantsOnMap();
 });
 
-// const getToken = async () => {
-//     try {
-//         const response = await fetchData(`${apiUrl}/users/token`);
+const getUserByToken = async () => {
+    try {
+        const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
-//         const data = await response.json();
-//         console.log(data);
+        if (!token) {
+            return null;
+        }
 
-//     } catch (error) {
-//         console.error(error);
-//     }
-// }
-
-// // getToken()
+        const options = {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        }
+        
+        const userData = await fetchData(`${apiUrl}/users/token`, options);
+        return userData;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}

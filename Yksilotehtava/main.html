@@ -17,16 +17,30 @@
 <body>
     <!-- Navbar starts here -->
     <nav class="navbar">
+        <div class="navbar-login" id="navbar-login">
+            <i class="fa-solid fa-circle-user"></i>
+            <p>Login</p>
+        </div>
         <div class="navbar-logo">
             <h1>Opiskelijaravintola</h1>
         </div>
         <div class="navbar-link">
-            <a href="#">Ravintolat</a>
-            <a href="#">Kartta</a>
+            <a href="#search">Ravintolat</a>
+            <a href="#map-section">Kartta</a>
         </div>
-        <div class="navbar-login" id="navbar-login">
+        <!-- <div class="navbar-login" id="navbar-login">
             <i class="fa-solid fa-circle-user"></i>
             <p>Login</p>
+        </div> -->
+        <!-- Only appears if screen size is small -->
+        <div class="navbar-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="navbar-box">
+            <div class="navbar-box-container">
+                <a href="#search">Ravintolat</a>
+                <a href="#map-section">Kartta</a>
+            </div>
         </div>
     </nav>
     <!-- Navbar ends here -->
@@ -45,7 +59,7 @@
                 <form action="#">
                     <div class="login-username">
                         <label for="login-username">Username</label>
-                        <input type="text" id="login-username" placeholder="Enter username" required>
+                        <input type="text" id="login-username" maxlength="12" placeholder="Enter username" required>
                     </div>
                     <!-- <div class="login-email">
                         <label for="login-email">Email</label>
@@ -59,7 +73,7 @@
                         <label for="remember-me">
                             <input type="checkbox" id="remember-me"> Remember me
                         </label>
-                        <a href="#">Forgot password?</a>
+                        <!-- <a href="#">Forgot password?</a> -->
                     </div>
                     <div class="login-submit">
                         <input type="submit" value="Sign in">
@@ -128,7 +142,7 @@
                     </label>
                 </div>
                 <div class="profile-info">
-                    <p>Username <input type="text" id="profile-username" disabled></p>
+                    <p>Username <input type="text" maxlength="12" id="profile-username" disabled></p>
                     <p>Email <input type="email" id="profile-email" disabled></p>
                     <p id="profile-error-message" style="display: none;"></p>
                     <p id="profile-success-message" style="display: none;"></p>
@@ -140,11 +154,23 @@
                 </div> -->
                 <div class="profile-account-buttons">
                     <button id="profile-cancel-btn" style="display: none;">Cancel</button>
-                    <button id="profile-edit-btn">Edit My Profile</button>
                     <button id="profile-save-btn" style="display: none;">Save</button>
+                    <button id="profile-edit-btn">Edit My Profile</button>
+                    <button id="profile-password-btn">Change Password</button>
                     <button id="profile-delete-btn">Delete My Account</button>
                 </div>
             </div>
+            <div class="profile-password" id="profile-password">
+                <div class="profile-password-container" id="profile-password-container">
+                    <i class="fa-solid fa-xmark" id="profile-password-close"></i>
+                    <div class="profile-password-item">
+                        <p>New password <input type="password" minlength="5" id="profile-new-password"></p>
+                        <p>Confirm password <input type="password" minlength="5" id="profile-confirm-password"></p>
+                        <button id="profile-change-password">Change password</button>
+                    </div>
+                </div>
+            </div>
+            <div class="change-password-overlay" id="change-password-overlay"></div>
         </div>
     </section>
 
@@ -152,10 +178,10 @@
     <!-- Profile section ends here -->
 
     <!-- Search section starts here -->
-    <section class="search">
+    <section class="search" id="search">
         <div class="search-container">
             <i class="fa-solid fa-arrow-right"></i>
-            <input type="text" id="search-restaurant-input" placeholder="Search for restaurant by name">
+            <input type="text" id="search-restaurant-input" placeholder="Search for restaurant">
             <div class="search-select-container">
                 <div class="search-select-box" id="city-select-box">
                     <button id="select-city-button">Select City<i class="fa-solid fa-angle-down"></i></button>
@@ -267,7 +293,7 @@
     <!-- Restaurant informations section ends here -->
 
     <!-- Map section starts here -->
-    <section class="map-section">
+    <section class="map-section" id="map-section">
         <div class="map-container"></div>
     </section>
     <!-- Map section ends here -->

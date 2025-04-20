@@ -32,6 +32,10 @@ i {
     font-size: 24px;
 }
 
+section {
+    scroll-margin-top: 80px;
+}
+
 /* Navbar starts here */
 .navbar {
     height: 70px;
@@ -42,7 +46,7 @@ i {
     background-color: #2D60FF;
     position: sticky;
     top: 0;
-    z-index: 998;
+    z-index: 1998;
 }
 
 .navbar-logo {
@@ -141,6 +145,38 @@ i {
 .navbar-logged-in:hover img {
     border: 2px solid #2D60F2;
 }
+
+.navbar-menu {
+    display: none;
+}
+
+.navbar-box {
+    display: none;
+    background-color: #2D60FF;
+    position: absolute;
+    right: 0;
+    top: 5rem;
+    border: 1px solid white;
+    border-radius: 5px;
+    flex-direction: column;
+    padding: 10px;
+    text-align: center;
+    margin-right: 10px;
+}
+
+.navbar-box-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.navbar-box-container a {
+    color: white;
+}
+
+.navbar-box-container a {
+    text-decoration: none;
+}
 /* Navbar ends here */
 
 /* Account section starts here */
@@ -152,7 +188,7 @@ i {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 2000;
     color: black;
     visibility: hidden;
 }
@@ -168,7 +204,7 @@ i {
 
 .account-box-image {
     width: 50%;
-    background-color: #2D60FF;
+    /* background-color: #2D60FF; */
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     overflow: hidden;
@@ -385,7 +421,7 @@ i {
     height: 100%;
     opacity: 0.9;
     top: 0;
-    z-index: 999;
+    z-index: 1999;
 }
 /* Account section ends here */
 
@@ -394,9 +430,9 @@ i {
     width: 40%;
     height: 100%;
     position: fixed;
-    right: 0;
+    left: 0;
     /* background-color: #242d47; */
-    z-index: 1005;
+    z-index: 2005;
     visibility: hidden;
     transition: 0.5s;
 }
@@ -412,11 +448,12 @@ i {
     padding: 2rem;  
     transition: 0.5s;
     opacity: 0;
-    transform: translateX(100%);
+    transform: translateX(-100%);
     display: flex;
     flex-direction: column;
     gap: 25px;
     overflow-y: auto;
+    z-index: 20200;
 }
 
 .open-profile-container {
@@ -533,7 +570,12 @@ i {
     border-radius: 5px;
     background-color: #2c56d1;
     font-weight: 300;
-    cursor: not-allowed;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.profile-info span:hover {
+    background-color: #396afc;
 }
 
 .profile-account-buttons {
@@ -556,6 +598,21 @@ i {
     background-color: #161616;
 }
 
+#profile-save-btn {
+    cursor: pointer;
+    color: white;
+    background-color: #396aff;
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: 500;
+    border: 1.5px solid white;
+    transition: 0.25s;
+}
+
+#profile-save-btn:hover {
+    background-color: #2A4bAE;
+}
+
 #profile-edit-btn {
     cursor: pointer;
     color: white;
@@ -571,19 +628,19 @@ i {
     background-color: #2A4bAE;
 }
 
-#profile-save-btn {
+#profile-password-btn {
     cursor: pointer;
     color: white;
-    background-color: #396aff;
+    background-color: #2D2D2D;
     padding: 10px;
     border-radius: 5px;
     font-weight: 500;
     border: 1.5px solid white;
-    transition: 0.25s;
+    transition: 0.25s;    
 }
 
-#profile-save-btn:hover {
-    background-color: #2A4bAE;
+#profile-password-btn:hover {
+    background-color: #1b1a1a;
 }
 
 #profile-delete-btn {
@@ -601,13 +658,97 @@ i {
     background-color: #c11919;
 }
 
+.profile-password {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /* background-color: #16398d; */
+    width: 70%;
+    height: 50%;
+    transform: translate(-50%, -50%);  
+    z-index: 2006; 
+    visibility: hidden;
+}
+
+.open-profile-password {
+    visibility: visible;
+}
+
+.profile-password-container {
+    background-color: #16398d;
+    transform: translateY(-100vh); 
+    padding: 20px;
+    border-radius: 5px;
+    opacity: 0;
+    z-index: 2000;
+    /* height: 100%; */
+    transition: 0.5s;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.profile-password-container i {
+    cursor: pointer;
+    width: fit-content;
+}
+
+.profile-password-container input {
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid white;
+    transition: 0.25s;
+}
+
+.profile-password-container input:hover {
+    border: 1px solid #2D2D2D;
+}
+
+.profile-password-container button {
+    width: 100%;
+    border-radius: 5px;
+    padding: 5px;
+    background-color: #2D60F2;
+    cursor: pointer;
+    color: white;
+    transition: 0.25s;
+}
+
+.profile-password-container button:hover {
+    background-color: #2A4bAE;
+}
+
+.open-profile-password-container {
+    transform: translateY(0);  
+    opacity: 1;
+}
+
+.profile-password-item {
+    display: flex;   
+    flex-direction: column;
+    gap: 15px;
+}
+
+.show-change-password-overlay {
+    background-color: black;
+    position: absolute;
+    opacity: 0.9;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s;
+    /* z-index: 2000; */
+}
+
 .show-profile-box-overlay {
     background-color: black;
     position: fixed;
     width: 100%;
     height: 100%;
     opacity: 0.9;
-    z-index: 999;
+    z-index: 1999;
     transition: 0.25s;
 }
 /* Profile section ends here */
@@ -665,10 +806,6 @@ i {
     position: relative;
 }
 
-.search-select-container button {
-    background-color: white;
-}
-
 .search-select-container::before {
     content: '';
     width: 1px;
@@ -696,6 +833,7 @@ i {
     border-radius: 5px;
     width: 100%;
     white-space: nowrap;
+    background-color: white;
 }
 
 .search-select-box button i {
@@ -783,8 +921,7 @@ i {
     justify-content: space-between;
     flex-wrap: wrap;
     flex: 1 1 calc(33.333% - 1rem);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.2);
 }
 
 .restaurant-box:hover {
@@ -876,7 +1013,7 @@ i {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    z-index: 1000;
+    z-index: 2000;
     visibility: hidden;
 }
 
@@ -932,12 +1069,10 @@ i {
     background-color: #343C6A;
 }
 
-.information-container div {
-}
-
 .information-header {
     position: sticky;
     top: 0;
+    z-index: 2010;
     background-color: white;
     display: flex;
     justify-content: space-between;
@@ -953,7 +1088,9 @@ i {
 }
 
 .information-date {
-    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
 
 .information-menu {
@@ -985,7 +1122,7 @@ i {
 }
 
 .information-map {
-    padding: 0 12px;
+    padding: 12px 20px;
 }
 
 .no-menu-message {
@@ -1000,7 +1137,7 @@ i {
     height: 100%;
     opacity: 0.9;
     top: 0;
-    z-index: 999;
+    z-index: 1999;
 }
 /* Restaurant's information section ends here */
 
@@ -1024,16 +1161,172 @@ i {
 }
 /* Map section ends here */
 
+.fa-xmark:hover {
+    transition: 0.25s;
+    color: #2D2D2D;
+}
+
 /* Responsive web design starts here */
-@media only screen and (max-width: 1024px) {
-    .restaurant-box {
-      flex: 1 1 calc(50% - 1rem);
+@media only screen and (max-width: 1380px) {
+    .information-container ul {
+        flex-direction: column;
+        width: fit-content;
     }
-  }
+}
+
+@media only screen and (max-width: 1124px) {
+    .account {
+        width: 90%;
+    }
+
+    .search-container {
+        width: auto;
+    }
+
+    .search-select-box {
+        padding: 0 8px;
+    }
+
+    .search-select-box button {
+        padding: 3px 10px;
+    }
+
+    .restaurant-box {
+        flex: 1 1 calc(50% - 1rem);
+    }
+
+    .profile-container {
+        padding: 1rem;
+    }
+
+    .profile-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .profile-account-buttons {
+        flex-direction: column;
+    }
+
+    .profile-password {
+        width: 80%;
+    }
+}
   
-  @media only screen and (max-width: 600px) {
-    .restaurant-box {
-      flex: 1 1 100%;
+
+@media only screen and (max-width: 768px) {
+    .navbar {
+        font-size: 14px;
+        padding: 10px;
     }
-  }
+
+    .navbar-login {
+        float: right;
+    }
+
+    .navbar-link {
+        display: none;
+    }
+
+    .navbar-menu {
+        display: block;
+    }
+
+    .open-navbar-box {
+        display: block;
+    }
+
+    .search-container {
+        padding: 0 10px;
+    }
+
+    .search-container i {
+        font-size: 16px;
+    }
+
+    .search-select-box {
+        padding: 0 4px;
+    }
+
+    .search-select-box button {
+        padding: 0 5px;
+    }
+
+    .account {
+        font-size: 12px;
+    }
+
+    .account-box-image {
+        display: none;
+    }
+
+    .account-container-login {
+        display: block;
+    }
+
+    .account-container-signup {
+        display: block;
+    }
+
+    .login-form, .show-login-form {
+        width: 100%;
+        animation: none;
+    }
+
+    .signup-form, .show-signup-form {
+        width: 100%;
+        transform: translateX(0);
+    }
+
+    .account-container-signup .signup-form {
+        animation: none;
+    }
+
+    .profile-container {
+        font-size: 12px;
+    }
+
+    .information-date {
+        margin: auto;
+    }
+
+    .restaurant-container {
+        justify-content: center;
+    }
+
+    .restaurant-box {
+        flex: 1 1 100%;
+        max-width: none;
+        max-width: 620px;
+    }
+
+    .profile-password-container {
+        padding: 10px;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    .navbar {
+        font-size: 12px;
+    }
+
+    .navbar-logged-in {
+        padding: 5px;
+    }
+
+    .search-container input {
+        padding: 0 5px;
+    }
+
+    .restaurant-box {
+        padding: 1rem;
+        max-width: 420px;
+        font-size: 12px;
+    }
+
+    .restaurant-box i {
+        font-size: 18px;
+    }
+}
 /* Responsive web design ends here */
